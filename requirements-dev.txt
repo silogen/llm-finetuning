@@ -1,0 +1,9 @@
+black[d]
+flake8
+isort
+mypy
+pre-commit
+pytest
+types-redis
+coverage
+jsonschema_markdown
