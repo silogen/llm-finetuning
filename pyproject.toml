@@ -1,0 +1,81 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "finetuning"
+description = "LLM finetuning library"
+version = "0.1.2"
+readme = "README.md"
+requires-python = ">=3.10,<3.12"  # mlflow needs to be updated to support python 3.12
+authors = [{ name = "SiloGen" }]
+maintainers = [{ name = "SiloGen" }]
+classifiers = ["Programming Language :: Python"]
+dynamic = ["dependencies", "optional-dependencies"]
+
+[tool.setuptools.dynamic]
+dependencies = { file = ["requirements.txt"] }
+
+[tool.setuptools.dynamic.optional-dependencies]
+dev = { file = ["requirements-dev.txt"] }
+
+[project.scripts]
+finetuning = "finetuning.cli:finetuning_main_cli"
+merge_adapter = "finetuning.cli:merge_adapter_cli"
+replace_tokens = "finetuning.cli:replace_tokens_cli"
+generate = "finetuning.cli:generation_cli"
+download_resources = "finetuning.cli:download_resources_cli"
+create_vllm_compatible_adapter = "finetuning.cli:create_vllm_compatible_adapter_cli"
+
+[tool.black]
+target-version = ['py310']
+line-length = 120
+include = '\.pyi?$'
+exclude = '''
+  /(
+  | \.git
+  )/
+  '''
+
+[tool.pytest.ini_options]
+addopts = "--doctest-modules"
+doctest_optionflags = "NORMALIZE_WHITESPACE ELLIPSIS"
+log_cli = "0"
+log_cli_level = "INFO"
+filterwarnings = [
+  "error",
+  'ignore:Pydantic V1 style `@validator` validators are deprecated.::huggingface_hub',
+  'ignore:TypedStorage is deprecated. It will be removed',
+  'ignore:pkg_resources is deprecated as an API:DeprecationWarning',
+  # PEFT emits these following two warnings while trying to automagically figure out whether it should save the
+  # embedding layers or not
+  'ignore:Setting `save_embedding_layers` to `True::peft',
+  'ignore:Could not find a config file in ::peft',
+  'ignore:Passing the following arguments to `Accelerator`',
+  'ignore:`resume_download` is deprecated and will be removed in version 1.0.0.:FutureWarning',
+  # This comes from gpt-2 tests in test_e2e:
+  'ignore:`clean_up_tokenization_spaces` was not set. It will be set to `True` by default',
+  # From transformers, let them fix:
+  'ignore:`torch.cpu.amp.autocast\(args...\)` is deprecated.',
+]
+
+[tool.mypy]
+python_version = "3.10"
+warn_unused_configs = true
+ignore_missing_imports = true
+strict = false
+pretty = true
+show_column_numbers = true
+no_implicit_optional = false
+explicit_package_bases = true
+scripts_are_modules = true
+check_untyped_defs = false
+files = ["src/**/*.py"]
+
+[tool.isort]
+profile = "black"
+py_version = 310
+line_length = 120
+known_first_party = [
+    "finetuning",
+]

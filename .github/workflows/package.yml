@@ -1,0 +1,66 @@
+name: Package - Finetuning
+
+on:
+  push:
+    paths:
+      - "src/finetuning/**"
+      - "docker/finetuning/cuda-silogen-finetuning-base.Dockerfile"
+      - "docker/finetuning/cuda-silogen-finetuning-worker.Dockerfile"
+      - "docker/finetuning/rocm-silogen-finetuning-base.Dockerfile"
+      - "docker/finetuning/rocm-silogen-finetuning-worker.Dockerfile"
+      - "requirements.txt"
+      - ".github/workflows/package.yml"
+      - "tests/"
+
+jobs:
+  common:
+    uses: ./.github/workflows/common.yml
+
+  finetuning-package-tests:
+    needs: common
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      - name: Install package and verify
+        run: |
+          python -m pip install --upgrade pip
+          pip install .
+          python scripts/test_package_installation.py finetuning
+          pip uninstall -y finetuning
+
+      - name: Install package in editable mode and verify
+        run: |
+          pip install -e .[dev]
+          python scripts/test_package_installation.py finetuning editable
+
+      - name: Run tests for python package
+        # Notes regarding the coverage and unittests:
+        # 1.
+        # Finetuning tests create a temporary file that is removed after the tests are over and makes coverage fail.
+        # Therefore we need to specifically omit that file.
+        # Reference: https://stackoverflow.com/questions/76807257/python-coverage-report-error-no-source-for-code-path-remote-module-non
+        # 2.
+        # We are not running pytest with -Werror here because the flag overrides the pyproject.toml.
+        # pyproject.toml already specifies to turn warnings into errors, but suppresses some specific,
+        # unavoidable warnings.
+        run: |
+          coverage run --branch --omit="**/*_remote_module_non_scriptable.py" -m pytest
+          coverage report -m
+          coverage html
+
+      - name: Archive code coverage results
+        uses: actions/upload-artifact@v4
+        with:
+          name: code-coverage-report-packages-finetuning
+          path: htmlcov
+
+      - name: Uninstall packages
+        run: |
+          pip uninstall -y finetuning
