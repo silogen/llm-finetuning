@@ -60,7 +60,7 @@ def finetuning_main_cli(argv=None):
         type=str,
         choices=METHODS.keys(),
         help="The kind of finetuning to run. SFT is Supervised FineTuning. While DPO stands for Direct Preference "
-        "Optimization, note that it immplements a set of related preference optimization algorithms such as IPO "
+        "Optimization, note that it implements a set of related preference optimization algorithms such as IPO "
         "and KTO as well.",
     )
     parser.add_argument("config", type=str, help="Path to the experiment's YAML config file.")
@@ -158,7 +158,7 @@ def create_vllm_compatible_adapter_cli(argv=None):
     parser.add_argument(
         "model_path",
         type=str,
-        help="Path to the model folder (e.g. path to th folder containing the adapter's) to be made compatible",
+        help="Path to the model folder (e.g. path to the folder containing the adapter) to be made compatible",
     )
     parser.add_argument(
         "--training-config",

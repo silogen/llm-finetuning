@@ -27,7 +27,7 @@ Finetuning
 
 positional arguments:
   {sft,dpo}             The kind of finetuning to run. SFT is Supervised FineTuning. While DPO stands for Direct Preference Optimization,
-                        note that it immplements a set of related preference optimization algorithms such as IPO and KTO as well.
+                        note that it implements a set of related preference optimization algorithms such as IPO and KTO as well.
   config                Path to the experiment's YAML config file.
 
 options:
@@ -120,7 +120,7 @@ usage: create_vllm_compatible_adapter [-h] [--training-config TRAINING_CONFIG] m
 Take in a HuggingFace adapter's binary folder path and remove the embeddings layer weights required for vLLM compatibility
 
 positional arguments:
-  model_path            Path to the model folder (e.g. path to th folder containing the adapter's) to be made compatible
+  model_path            Path to the model folder (e.g. path to the folder containing the adapter) to be made compatible
 
 options:
   -h, --help            show this help message and exit
@@ -133,10 +133,10 @@ options:
 An example of tracking config part in sft config yaml file is:
 
 ```yaml
- tracking:
-   mlflow_server_uri: "file:///home/<USERNAME>/mlruns"
-   experiment_name: "default"
-   hf_mlflow_log_artifacts: "False"
+tracking:
+  mlflow_server_uri: "file:///home/<USERNAME>/mlruns"
+  experiment_name: "default"
+  hf_mlflow_log_artifacts: "False"
 ```
 
 One has two choices how to record experiment details to MLFlow. It can be local directory or a remote MLFlow instance.
