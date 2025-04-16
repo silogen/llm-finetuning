@@ -141,7 +141,7 @@ tracking:
 
 One has two choices how to record experiment details to MLFlow. It can be local directory or a remote MLFlow instance.
 If recording to local directory on your compute node instance you can set `tracking.mlflow_server_uri` to a local directory path
-prefxed with `file://`, e.g. `file:///home/<USERNAME>/mlruns`. If you ran it on Docker, make sure that you map this directory to the host directory, so that all recorded information gets persisted after Docker container stops. Then you can launch mlflow ui using a command:
+prefixed with `file://`, e.g. `file:///home/<USERNAME>/mlruns`. If you ran it on Docker, make sure that you map this directory to the host directory, so that all recorded information gets persisted after Docker container stops. Then you can launch mlflow ui using a command:
 
 ```bash
 mlflow ui --backend-store-uri file:///home/<USERNAME>/mlruns
