@@ -18,22 +18,21 @@ The finetuning package installs a script to run finetuning:
 
 ```
 > finetuning --help
-
-usage: finetuning [-h] [--num-preprocess-workers NUM_PREPROCESS_WORKERS] [--mlflow-server-uri MLFLOW_SERVER_URI]
-[--experiment-name EXPERIMENT_NAME]
+usage: finetuning [-h] [--logging-level LOGGING_LEVEL] [--num-preprocess-workers NUM_PREPROCESS_WORKERS]
+                  [--mlflow-server-uri MLFLOW_SERVER_URI] [--experiment-name EXPERIMENT_NAME]
                   [--hf-mlflow-log-artifacts HF_MLFLOW_LOG_ARTIFACTS]
                   {sft,dpo} config
 
 Finetuning
 
 positional arguments:
-  {sft,dpo}             The kind of finetuning to run. SFT is Supervised FineTuning. While DPO stands for Direct
-                        Preference Optimization, note that it immplements a set of related preference optimization
-                        algorithms such as IPO and KTO as well.
+  {sft,dpo}             The kind of finetuning to run. SFT is Supervised FineTuning. While DPO stands for Direct Preference Optimization,
+                        note that it immplements a set of related preference optimization algorithms such as IPO and KTO as well.
   config                Path to the experiment's YAML config file.
 
 options:
   -h, --help            show this help message and exit
+  --logging-level LOGGING_LEVEL
   --num-preprocess-workers NUM_PREPROCESS_WORKERS
                         Number of processes to use for preprocessing
   --mlflow-server-uri MLFLOW_SERVER_URI
@@ -48,7 +47,7 @@ options:
 
 The finetuning package sets the per-device batchsize semi-automatically. You define the target total batch size, and the maximum per-device batch size, and then you can start the same config with one training process or many parallel ones, and finetuning sets the per-device batch size as high as allowed, while keeping the total batch size at the target number.
 
-Total batch size is the effective batch size for the complete training run. It is equal to number of processes _ per-device batch size _ accumulation.
+Total batch size is the effective batch size for the complete training run. It is equal to `number of processes` \* `per-device batch size` \* `accumulation`.
 
 The maximum batch size per device is the maximum batch size that can be accommodated on a single device. This mostly limited by the memory capacity of the device.
 
@@ -91,12 +90,11 @@ Furthermore, for inference you must
 - merge the adapter in to the model OR
 - prepare vLLM compatible adapters
 
-For **merging the adapter**, use `merge_adapter` CLI from the finetuning package.
+For **merging the adapter**, use the `merge_adapter` CLI.
 
 ```
-
 > merge_adapter  --help
-usage: merge_adapter [-h] [--tokenizer TOKENIZER]  [--device_map "auto"|"cpu"|"cuda"|a JSON string] basemodel peftmodel outpath
+usage: merge_adapter [-h] [--tokenizer TOKENIZER] [--device_map DEVICE_MAP] basemodel peftmodel outpath
 
 Merges adapters into a base model and saves the output as a single model
 
@@ -108,34 +106,33 @@ positional arguments:
 options:
   -h, --help            show this help message and exit
   --tokenizer TOKENIZER
-                        Name or Path to tokenizer to save with the model. If not specified, will use the adapter model
-                        tokenizer.
+                        Name or Path to tokenizer to save with the model. If not specified, will use the adapter model tokenizer.
   --device_map DEVICE_MAP
                         Device map for loading the model. Can be 'auto', 'cpu', 'cuda' or a JSON string.
 ```
 
-For **preparing vLLM compatible adapters**, use `create_vllm_compatible_adapter` CLI from the finetuning package.
+For **preparing vLLM compatible adapters**, use the `create_vllm_compatible_adapter` CLI.
 
 ```
-
 > create_vllm_compatible_adapter --help
-usage: create_vllm_compatible_adapter [-h] model outpath
+usage: create_vllm_compatible_adapter [-h] [--training-config TRAINING_CONFIG] model_path
 
-Take in a HuggingFace adapter weights binary and remove the embeddings layer weights required for vLLM compatibility
+Take in a HuggingFace adapter's binary folder path and remove the embeddings layer weights required for vLLM compatibility
 
 positional arguments:
-  model       Path to the model
-  outpath     Path where to write the model
+  model_path            Path to the model folder (e.g. path to th folder containing the adapter's) to be made compatible
 
 options:
-  -h, --help  show this help message and exit
+  -h, --help            show this help message and exit
+  --training-config TRAINING_CONFIG
+                        Path to training config to check and determine whether the layers should be removed or not.
 ```
 
 ## Setting up MLFlow logging
 
 An example of tracking config part in sft config yaml file is:
 
-```
+```yaml
  tracking:
    mlflow_server_uri: "file:///home/<USERNAME>/mlruns"
    experiment_name: "default"
@@ -146,13 +143,13 @@ One has two choices how to record experiment details to MLFlow. It can be local 
 If recording to local directory on your compute node instance you can set `tracking.mlflow_server_uri` to a local directory path
 prefxed with `file://`, e.g. `file:///home/<USERNAME>/mlruns`. If you ran it on Docker, make sure that you map this directory to the host directory, so that all recorded information gets persisted after Docker container stops. Then you can launch mlflow ui using a command:
 
-```
+```bash
 mlflow ui --backend-store-uri file:///home/<USERNAME>/mlruns
 ```
 
 and do a port forward to your local machine:
 
-```
+```bash
 ssh -L 5003:localhost:5000 YOUR_COMPUTE_NODE
 ```
 
@@ -167,7 +164,7 @@ If you want to log artifacts generated by your trainer set `hf_mlflow_log_artifa
 
 `tracking` section of sft config is optional and can be skipped overall. `mlflow_server_uri` in `tracking` section of sft config is optional too and can be set empty to indicate that sft config is not used to set up MLFlow tracking. MLFlow configuration set through config file has precedence over settings supplied in environmental variables, when both ways of configuring MLFlow are used simultaneously. In turn, MLFlow configuration set through command line arguments has precedence over both config file and environment variables. Alternative way to activate MLFlow tracking would be to set environment variables e.g.:
 
-```
+```bash
 export MLFLOW_EXPERIMENT_NAME=your_experiment_name
 export MLFLOW_FLATTEN_PARAMS=TRUE
 export MLFLOW_TRACKING_URI=file:///home/<USERNAME>/mlruns
@@ -210,7 +207,7 @@ not supported by vLLM, but is supported by HuggingFace.
 
 An example of running generation via docker run:
 
-```
+```bash
 docker run \
   --rm --gpus --device /dev/kfd --device /dev/dri --security-opt seccomp=unconfined \
   -it \
@@ -220,7 +217,7 @@ docker run \
   --mount type=bind,source="/local/silogen-sdx/datasets/,target=/datasets" \
   -e ACCELERATE_LOG_LEVEL=info \
   --entrypoint generate \
-  rocm-silogen-finetuning-worker:<your-chosen-tag> \
+  rocm-silogen-finetuning-worker:YOUR_CHOSEN_TAG \
   /path/to/generate_config.yaml \
   /path/to/output.yaml
 ```
