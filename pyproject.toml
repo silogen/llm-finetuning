@@ -7,7 +7,7 @@ name = "finetuning"
 description = "LLM finetuning library"
 version = "0.1.2"
 readme = "README.md"
-requires-python = ">=3.10,<3.12"  # mlflow needs to be updated to support python 3.12
+requires-python = ">=3.10"
 authors = [{ name = "SiloGen" }]
 maintainers = [{ name = "SiloGen" }]
 classifiers = ["Programming Language :: Python"]
