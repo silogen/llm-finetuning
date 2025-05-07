@@ -134,15 +134,17 @@ class RunConfig(BaseConfig):
         default="checkpoint-final", description="Name of final checkpoint. Should be left as default"
     )
     determinism: Literal["no", "half", "full"] = Field(
-        default = "no",
-        description = dedent("""\
+        default="no",
+        description=dedent(
+            """\
             Set the level of determinism in implementations. Deterministic implementations are not always available,
             and when they are, they are usually slower than their non-deterministic counterparts. Recommended for
             debugging only.
             'no': No determinism.
-            'half': Prefer deterministic implementations. 
-            'full': Only fully deterministic implementations, error out on operations that only have non-deterministic 
-                    implementations.""")
+            'half': Prefer deterministic implementations.
+            'full': Only fully deterministic implementations, error out on operations that only have non-deterministic
+                    implementations."""
+        ),
     )
 
     def model_post_init(self, __context):

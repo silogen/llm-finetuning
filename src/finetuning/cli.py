@@ -5,7 +5,7 @@ import logging
 from collections import namedtuple
 
 from pydantic import ValidationError
-from transformers import AutoTokenizer, set_seed, enable_full_determinism
+from transformers import AutoTokenizer, enable_full_determinism, set_seed
 
 import finetuning.utils.running_process_opts as running_process_opts
 from finetuning.config import DPOExperimentConfig, GenerationConfig, SFTExperimentConfig
@@ -72,7 +72,7 @@ def finetuning_main_cli(argv=None):
     if config.run_conf.determinism == "full":
         enable_full_determinism(config.training_args.seed, warn_only=False)
     else:
-        set_seed(config.training_args.seed, deterministic=config.run_conf.determinism=="half")
+        set_seed(config.training_args.seed, deterministic=config.run_conf.determinism == "half")
     running_process_opts.setup_running_process_options(args)
     runner(config)
 
