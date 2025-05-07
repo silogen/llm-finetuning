@@ -104,6 +104,7 @@ run_conf:
     use_cache: False
     revision: 91c0fe31d692dd8448d9bc06e8d1877345009e3b
   resume_from_checkpoint: False
+  determinism: "full"
 """
     num_steps = 15
     # 1. setup
@@ -185,6 +186,7 @@ run_conf:
     use_cache: False
     revision: 91c0fe31d692dd8448d9bc06e8d1877345009e3b
   resume_from_checkpoint: False
+  determinism: "half"
 """
     num_steps = 15
     # 1. setup
