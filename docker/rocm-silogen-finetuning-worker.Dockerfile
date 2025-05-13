@@ -6,3 +6,4 @@ RUN pip install --no-cache-dir --extra-index-url https://download.pytorch.org/wh
 RUN pip install --no-cache-dir --extra-index-url https://download.pytorch.org/whl/rocm6.2 /finetuning
 
 WORKDIR /workdir
+RUN mkdir /workdir/logs
