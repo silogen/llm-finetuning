@@ -15,17 +15,17 @@ class ModelArguments(BaseConfig):
     https://huggingface.co/docs/transformers/main/en/main_classes/model#transformers.PreTrainedModel.from_pretrained
     See below in "Parameters for big model inference" too, it affects training too. Also note that this link takes you
     to the transformers main branch version - be sure to compare with the installed version of transformers (that keeps
-    changing over time, and it is difficult to keep this doctstring up to date, so we wanted to link to the latest here).
+    changing over time, and it is difficult to keep this docstring up to date, so we wanted to link to the latest here).
 
     Some important parameters to consider are:
 
-    device_map :
+    - device_map :
         A map that specifies where each submodule should go. It doesn’t need to be refined to each parameter/buffer
         name, once a given module name is inside, every submodule of it will be sent to the same device. If we only pass
         the device (e.g., "cpu", "cuda:1", "mps", or a GPU ordinal rank like 1) on which the model will be allocated,
         the device map will map the entire model to this device. Passing device_map = 0 means put the whole model on GPU
         0.
-    attn_implementation :
+    - attn_implementation :
         The attention implementation to use in the model (if relevant). Can be any of "eager" (manual implementation of
         the attention), "sdpa" (using F.scaled_dot_product_attention), or "flash_attention_2" (using
         Dao-AILab/flash-attention). By default, if available, SDPA will be used for torch>=2.1.1. The default is
@@ -58,21 +58,27 @@ class ModelArguments(BaseConfig):
         else:
             return str(x)[len("torch.") :]  # Remove the "torch." prefix
 
-    # Custom device map so that you can manually override the choices that HuggingFace would make.
-    # This can also be a string to specify "auto", "balanced_low_0", or "sequential"
-    device_map: Dict[str, int | str] | str | None = None
+    device_map: Dict[str, int | str] | str | None = Field(
+        default=None,
+        description='Custom device map so that you can manually override the choices that HuggingFace would make. This can also be a string to specify "auto", "balanced_low_0", or "sequential".',
+    )
     max_memory: Optional[Dict[str, str]] = None
     low_cpu_mem_usage: bool = False
-    # Note: this can be set to "sdpa", "flash_attention_2", "eager"
-    attn_implementation: Optional[str] = None
+    attn_implementation: Optional[str] = Field(
+        default=None,
+        description='Note: this can be set to "sdpa", "flash_attention_2", "eager".',
+    )
     offload_folder: Optional[str] = None
-    offload_state_dict: Optional[bool] = None  # Default is True if offloading (otherwise no effect)
+    offload_state_dict: Optional[bool] = Field(
+        default=None,
+        description="Default is True if offloading (otherwise no effect)",
+    )
     offload_buffers: Optional[bool] = None
 
-    # Saves generated hidden states to speed up generation
-    # see: https://discuss.huggingface.co/t/what-is-the-purpose-of-use-cache-in-decoder/958
-    # use_cache is mutually exclusive with gradient_checkpointing
-    use_cache: bool = True
+    use_cache: bool = Field(
+        default=True,
+        description="Saves generated hidden states to speed up generation, see: https://discuss.huggingface.co/t/what-is-the-purpose-of-use-cache-in-decoder/958 This is mutually exclusive with gradient_checkpointing.",
+    )
 
     # HF HUB arguments:
     cache_dir: Optional[str] = None
@@ -86,8 +92,10 @@ class ModelArguments(BaseConfig):
     token: Optional[str] = None
     use_safetensors: Optional[bool] = None
     variant: Optional[str] = None
-    # Warning: if set to True, allows execution of downloaded remote code
-    trust_remote_code: bool = False
+    trust_remote_code: bool = Field(
+        default=False,
+        description="Warning: if set to True, allows execution of downloaded remote code.",
+    )
 
     def model_post_init(self, __context):
         accelerate_state = PartialState()
@@ -126,7 +134,7 @@ class RunConfig(BaseConfig):
         default=False,
         description=dedent(
             """\
-        Normally should be set to 'auto' to continue if a checkpoint exists.
+        Normally should be set to 'auto' to continue if a checkpoint exists.\
         Can set to True to always try to continue, False to never try, or a path to load from a specific path."""
         ),
     )
@@ -137,12 +145,12 @@ class RunConfig(BaseConfig):
         default="no",
         description=dedent(
             """\
-            Set the level of determinism in implementations. Deterministic implementations are not always available,
-            and when they are, they are usually slower than their non-deterministic counterparts. Recommended for
-            debugging only.
-            'no': No determinism.
-            'half': Prefer deterministic implementations.
-            'full': Only fully deterministic implementations, error out on operations that only have non-deterministic
+            Set the level of determinism in implementations. Deterministic implementations are not always available,\
+            and when they are, they are usually slower than their non-deterministic counterparts. Recommended for\
+            debugging only.\
+            'no': No determinism.\
+            'half': Prefer deterministic implementations.\
+            'full': Only fully deterministic implementations, error out on operations that only have non-deterministic\
                     implementations."""
         ),
     )

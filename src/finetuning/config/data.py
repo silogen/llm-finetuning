@@ -7,6 +7,8 @@ from finetuning.config.base import BaseConfig
 
 
 class ChatTemplateName(str, Enum):
+    """Chat template to use."""
+
     MISTRAL_WITH_SYSTEM = "mistral-with-system"
     CHAT_ML = "chat-ml"
     PORO = "poro"
@@ -52,8 +54,10 @@ class DataInput(BaseConfig):
     """Base config for data input"""
 
     type: DataInputType
-    # Note: generally, the data_type is automatically set based on the experiment config method
-    data_type: str = "ChatConversation"  # type: ignore
+    data_type: str = Field(
+        default="ChatConversation",
+        description="Generally, the data_type is automatically set based on the experiment config method.",
+    )
 
 
 class ConcatenationDataInput(DataInput):
@@ -63,9 +67,12 @@ class ConcatenationDataInput(DataInput):
 
     The datasets themselves need to be in the finetuning supported JSONL formats.
     For SFT this means lines:
-    {"messages": {"content": "string", "role": "string"}}
+
+        {"messages": {"content": "string", "role": "string"}}
+
     For DPO this means lines of:
-    {"prompt_messages": {"content": "string", "role": "string"}, "chosen_messages": {"content": "string", "role": "string"}, "rejected_messages": {"content": "string", "role": "string"}}
+
+        {"prompt_messages": {"content": "string", "role": "string"}, "chosen_messages": {"content": "string", "role": "string"}, "rejected_messages": {"content": "string", "role": "string"}}
     """
 
     type: Literal[DataInputType.CONCATENATION]
@@ -81,9 +88,12 @@ class WeightedMixDataInput(DataInput):
 
     The datasets themselves need to be in the finetuning supported JSONL formats.
     For SFT this means lines:
-    {"messages": {"content": "string", "role": "string"}}
+
+        {"messages": {"content": "string", "role": "string"}}
+
     For DPO this means lines of:
-    {"prompt_messages": {"content": "string", "role": "string"}, "chosen_messages": {"content": "string", "role": "string"}, "rejected_messages": {"content": "string", "role": "string"}}
+
+        {"prompt_messages": {"content": "string", "role": "string"}, "chosen_messages": {"content": "string", "role": "string"}, "rejected_messages": {"content": "string", "role": "string"}}
     """
 
     type: Literal[DataInputType.PRECOMPUTE_WEIGHTED_MIX]
