@@ -31,8 +31,7 @@ logger = logging.get_logger(__file__)
 class FinetuningTrackingConfig(TrackingConfig):
     """Settings that define how run details are logged"""
 
-    hf_mlflow_log_artifacts: str = "False"
-    "Whether to store model artifacts in MLFlow"
+    hf_mlflow_log_artifacts: str = Field(default="False", description="Whether to store model artifacts in MLFlow.")
 
 
 class Overrides(BaseConfig):
@@ -47,9 +46,9 @@ class Overrides(BaseConfig):
     lr_batch_size_scaling: Literal["none", "sqrt", "linear"] = Field(
         default="none",
         description=dedent(
-            """Scales the learning rate in the training_args by a factor derived from the total training batch size.
-            'none': No scaling.
-            'sqrt': Multiplies learning rate by square root of batch size (a classic scaling rule).
+            """Scales the learning rate in the training_args by a factor derived from the total training batch size. \
+            'none': No scaling. \
+            'sqrt': Multiplies learning rate by square root of batch size (a classic scaling rule). \
             'linear': Multiplies learning rate by the batch size (a more modern scaling rule).
             """
         ),
