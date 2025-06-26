@@ -225,7 +225,7 @@ class PretrainedPeftConfig(BaseConfig):
     """PEFT adapter uses the config and initialisation from a pretrained adapter"""
 
     peft_type: Literal[PRETRAINED_PEFT]  # type: ignore
-    name_or_path: str  # HF ID or path to the pretrained peft
+    name_or_path: str = Field(description="HF ID or path to the pretrained peft.")
 
 
 class GenericPeftConfig(BaseConfig):
@@ -234,8 +234,8 @@ class GenericPeftConfig(BaseConfig):
     See https://huggingface.co/docs/peft/tutorial/peft_model_config for the possible kwargs
     and https://github.com/huggingface/peft/blob/v0.7.1/src/peft/utils/peft_types.py for the types.
 
-    Example
-    =======
+    Example:
+
         >>> loaded_data = {'peft_type':'LORA', 'task_type': 'CAUSAL_LM',
         ...         'peft_kwargs': {'r': 32, 'target_modules': ['v_proj']}}
         >>> generic_conf = GenericPeftConfig(**loaded_data)
@@ -263,6 +263,8 @@ class GenericPeftConfig(BaseConfig):
 
 
 class SFTArguments(BaseConfig):
+    """Supervised fine-tuning arguments"""
+
     max_seq_length: int = Field(
         default=2048, description="Maximum length input sequence length. Longer sequences will be filtered out."
     )
@@ -272,4 +274,4 @@ class SFTArguments(BaseConfig):
     save_name_if_new_basemodel: str = Field(
         default="checkpoint-new-basemodel", description="If a new basemodel is saved, it will be saved with this name"
     )
-    train_on_completions_only: bool = Field(default=False, description="Only comput loss on the assistant's turns.")
+    train_on_completions_only: bool = Field(default=False, description="Only compute loss on the assistant's turns.")
