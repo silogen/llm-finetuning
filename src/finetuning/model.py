@@ -18,6 +18,20 @@ def get_model(model_name_or_path, model_load_kwargs, quantization_config=None):
     """Creates an instance of the desired model"""
     model_load_kwargs["quantization_config"] = quantization_config
     model = transformers.AutoModelForCausalLM.from_pretrained(model_name_or_path, **model_load_kwargs)
+    if quantization_config is not None:
+        model_load_kwargs["quantization_config"] = quantization_config
+    try:
+        model = transformers.AutoModelForCausalLM.from_pretrained(model_name_or_path, **model_load_kwargs)
+    except ImportError as e:
+        # Try to intercept those misleading error messages from cases where the Flash Attention import fails
+        # because of CUDA not being available,
+        if "Flash Attention" in e.message and "is not available" in e.message:
+            if not torch.cuda.is_available():
+                raise ValueError(
+                    "Running on CPU - is this intentional? Flash attention is not available on CPU."
+                ) from e
+        else:
+            raise e
     return model
 
 
