@@ -16,7 +16,8 @@ logger = transformers.utils.logging.get_logger(__file__)
 
 def get_model(model_name_or_path, model_load_kwargs, quantization_config=None):
     """Creates an instance of the desired model"""
-    model_load_kwargs["quantization_config"] = quantization_config
+    if quantization_config is not None:
+        model_load_kwargs["quantization_config"] = quantization_config
     model = transformers.AutoModelForCausalLM.from_pretrained(model_name_or_path, **model_load_kwargs)
     return model
 
