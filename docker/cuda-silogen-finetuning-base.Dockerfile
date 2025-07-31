@@ -25,7 +25,7 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
 COPY packages/finetuning/requirements.txt /code/requirements.txt
 RUN pip install --no-cache-dir -r /code/requirements.txt \
     && pip install --no-cache-dir flash-attn --no-build-isolation \
-    && pip install --no-cache-dir bitsandbytes==0.44.1 --no-deps \
+    && pip install --no-cache-dir bitsandbytes==1.0.0 --no-deps \
     && pip install --no-cache-dir deepspeed tensorboard
 
 # Use WORKDIR to set the working directory and avoid using separate RUN command for chown

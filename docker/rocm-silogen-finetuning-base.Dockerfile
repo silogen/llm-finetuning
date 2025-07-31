@@ -49,7 +49,7 @@ COPY --from=final_wheels /wheels/*.whl /libs/
 RUN pip install torch==2.6.0 --index-url https://download.pytorch.org/whl/rocm6.2.4 \
     && pip install --no-cache-dir transformers[tokenizers]==4.53.0 \
     && pip install --no-cache-dir --force-reinstall \
-    'https://github.com/bitsandbytes-foundation/bitsandbytes/releases/download/continuous-release_multi-backend-refactor/bitsandbytes-0.44.1.dev0-py3-none-manylinux_2_24_x86_64.whl' \
+    'https://github.com/bitsandbytes-foundation/bitsandbytes/releases/download/continuous-release_multi-backend-refactor/bitsandbytes-1.0.0-py3-none-manylinux_2_24_x86_64.whl' \
     --no-deps \
     && pip install --no-cache-dir deepspeed tensorboard
 
