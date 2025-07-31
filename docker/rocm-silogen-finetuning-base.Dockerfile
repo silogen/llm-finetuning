@@ -1,7 +1,7 @@
 # TODO: The flash attention wheel image is private
 FROM ghcr.io/silogen/rocm6.2-vllm0.6.3-flash-attn2.6.3-wheels:static AS final_wheels
 
-FROM rocm/dev-ubuntu-22.04:6.2 AS final
+FROM rocm/dev-ubuntu-22.04:6.2.4 AS final
 
 ARG DEBIAN_FRONTEND=noninteractive
 
@@ -46,8 +46,8 @@ ENV CPLUS_INCLUDE_PATH=$CPLUS_INCLUDE_PATH:/libtorch/include:/libtorch/include/t
 
 COPY --from=final_wheels /wheels/*.whl /libs/
 
-RUN pip install --no-cache-dir torch==2.5.1 --index-url https://download.pytorch.org/whl/rocm6.2 \
-    && pip install --no-cache-dir transformers[tokenizers]==4.49.0 \
+RUN pip install torch==2.6.0 --index-url https://download.pytorch.org/whl/rocm6.2.4 \
+    && pip install --no-cache-dir transformers[tokenizers]==4.53.0 \
     && pip install --no-cache-dir --force-reinstall \
     'https://github.com/bitsandbytes-foundation/bitsandbytes/releases/download/continuous-release_multi-backend-refactor/bitsandbytes-0.44.1.dev0-py3-none-manylinux_2_24_x86_64.whl' \
     --no-deps \
