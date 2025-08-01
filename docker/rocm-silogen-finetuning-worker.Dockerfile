@@ -9,4 +9,5 @@ RUN sudo apt remove --yes python3-blinker \
 RUN pip install --no-cache-dir /finetuning
 
 WORKDIR /workdir
-RUN mkdir /workdir/logs
+RUN mkdir /workdir/logs \
+    && chown -hR ${USER_NAME}:${GROUP_NAME} /workdir/logs
