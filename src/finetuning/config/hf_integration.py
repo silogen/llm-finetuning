@@ -239,14 +239,8 @@ class GenericPeftConfig(BaseConfig):
         >>> loaded_data = {'peft_type':'LORA', 'task_type': 'CAUSAL_LM',
         ...         'peft_kwargs': {'r': 32, 'target_modules': ['v_proj']}}
         >>> generic_conf = GenericPeftConfig(**loaded_data)
-        >>> # Then later in the code something like:
-        >>> model = transformers.AutoModel.from_pretrained('hf-internal-testing/tiny-random-MistralModel')
-        >>> peft.get_peft_model(model, generic_conf.get_peft_config())
-        PeftModelForCausalLM(
-          (base_model): LoraModel(
-            ...
-          )
-        )
+        >>> generic_conf.get_peft_config()
+        LoraConfig(task_type=<TaskType.CAUSAL_LM: 'CAUSAL_LM'>, peft_type=<PeftType.LORA: 'LORA'>, ...)
     """
 
     # TODO: Discriminate automatically between different PeftConfigs.
