@@ -240,7 +240,9 @@ class GenericPeftConfig(BaseConfig):
         ...         'peft_kwargs': {'r': 32, 'target_modules': ['v_proj']}}
         >>> generic_conf = GenericPeftConfig(**loaded_data)
         >>> # Then later in the code something like:
-        >>> model = transformers.AutoModel.from_pretrained('trl-internal-testing/tiny-random-LlamaForCausalLM')
+        >>> model = transformers.AutoModel.from_pretrained('hf-internal-testing/tiny-random-MistralModel',
+        ...     revision="7517176934d50d00707900b92ef6a95c782e51a2", attention_implementation="eager",
+        ...     use_cache=False)
         >>> peft.get_peft_model(model, generic_conf.get_peft_config())
         PeftModelForCausalLM(
           (base_model): LoraModel(
