@@ -4,11 +4,7 @@ FROM ghcr.io/silogen/cuda-silogen-finetuning-base:main
 # Set working directory
 WORKDIR /code
 
-COPY packages/finetuning ./finetuning
-COPY docker/finetuning/requirements-worker.txt ./finetuning
-
-# Install all requirements (finetuning package is included in the worker requirements)
-RUN pip install --no-cache-dir -r finetuning/requirements-worker.txt
+COPY . ./finetuning
 
 # Environment variables for HuggingFace
 ENV HF_HOME="/HF_HOME/"

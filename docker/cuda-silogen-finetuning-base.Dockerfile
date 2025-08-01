@@ -22,10 +22,10 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
 # Install the finetuning dependencies.
 # Also install bitsandbytes here, it keeps emitting warnings when running on CPU, which are not allowed in our automated
 # tests. In any case, bitsandbytes currently seems to only support a GPU backend so only the GPU targets are relevant.
-COPY packages/finetuning/requirements.txt /code/requirements.txt
+COPY requirements.txt /code/requirements.txt
 RUN pip install --no-cache-dir -r /code/requirements.txt \
     && pip install --no-cache-dir flash-attn --no-build-isolation \
-    && pip install --no-cache-dir bitsandbytes==1.0.0 --no-deps \
+    && pip install --no-cache-dir --no-deps https://github.com/bitsandbytes-foundation/bitsandbytes/releases/download/continuous-release_main/bitsandbytes-1.33.7.preview-py3-none-manylinux_2_24_x86_64.whl \
     && pip install --no-cache-dir deepspeed tensorboard
 
 # Use WORKDIR to set the working directory and avoid using separate RUN command for chown

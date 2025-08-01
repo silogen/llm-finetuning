@@ -6,6 +6,7 @@ set -eu
 
 DEFAULT_REGISTRY=ghcr.io/silogen
 REGISTRY=${REGISTRY:-$DEFAULT_REGISTRY}
+SKIP_PUSH=${SKIP_PUSH:-"false"}
 
 if [ "$#" -ne 2 ]; then
   echo "Usage: $0 <platform> <tag>"
@@ -28,5 +29,7 @@ sed "s,FROM $DEFAULT_REGISTRY/$platform-silogen-finetuning-base:main,FROM $REGIS
   docker/$platform-silogen-finetuning-worker.Dockerfile > $tmp_worker_dockerfile
 docker build -f docker/$platform-silogen-finetuning-base.Dockerfile -t "$REGISTRY/$platform-silogen-finetuning-base:$tag" .
 docker build -f $tmp_worker_dockerfile -t "$REGISTRY/$platform-silogen-finetuning-worker:$tag" --build-arg tag="$tag" .
-docker push "$REGISTRY/$platform-silogen-finetuning-base:$tag"
-docker push "$REGISTRY/$platform-silogen-finetuning-worker:$tag"
+if [ ! $SKIP_PUSH == "true" ]; then
+  docker push "$REGISTRY/$platform-silogen-finetuning-base:$tag"
+  docker push "$REGISTRY/$platform-silogen-finetuning-worker:$tag"
+fi
