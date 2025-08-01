@@ -241,7 +241,7 @@ class GenericPeftConfig(BaseConfig):
         >>> generic_conf = GenericPeftConfig(**loaded_data)
         >>> # Then later in the code something like:
         >>> model = transformers.AutoModel.from_pretrained('trl-internal-testing/tiny-MistralForCausalLM-0.1',
-        ...     attention_implementation="eager", use_cache=False)
+        ...     attn_implementation="eager", use_cache=False)
         >>> peft.get_peft_model(model, generic_conf.get_peft_config())
         PeftModelForCausalLM(
           (base_model): LoraModel(
