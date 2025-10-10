@@ -68,11 +68,14 @@ class ConcatenationDataInput(DataInput):
     The datasets themselves need to be in the finetuning supported JSONL formats.
     For SFT this means lines:
 
-        {"messages": {"content": "string", "role": "string"}}
+    {"messages": [{"content": "string", "role": "string"}]}
 
     For DPO this means lines of:
-
-        {"prompt_messages": {"content": "string", "role": "string"}, "chosen_messages": {"content": "string", "role": "string"}, "rejected_messages": {"content": "string", "role": "string"}}
+    {
+       "prompt_messages": [{"content": "string", "role": "string"}],
+       "chosen_messages": [{"content": "string", "role": "string"}],
+        "rejected_messages": [{"content": "string", "role": "string"}]
+    }
     """
 
     type: Literal[DataInputType.CONCATENATION]
@@ -89,11 +92,14 @@ class WeightedMixDataInput(DataInput):
     The datasets themselves need to be in the finetuning supported JSONL formats.
     For SFT this means lines:
 
-        {"messages": {"content": "string", "role": "string"}}
+    {"messages": [{"content": "string", "role": "string"}]}
 
     For DPO this means lines of:
-
-        {"prompt_messages": {"content": "string", "role": "string"}, "chosen_messages": {"content": "string", "role": "string"}, "rejected_messages": {"content": "string", "role": "string"}}
+    {
+       "prompt_messages": [{"content": "string", "role": "string"}],
+       "chosen_messages": [{"content": "string", "role": "string"}],
+        "rejected_messages": [{"content": "string", "role": "string"}]
+    }
     """
 
     type: Literal[DataInputType.PRECOMPUTE_WEIGHTED_MIX]
