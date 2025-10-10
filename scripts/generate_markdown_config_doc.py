@@ -1,6 +1,14 @@
+import argparse
+
 import jsonschema_markdown
 
 import finetuning
+
+parser = argparse.ArgumentParser("Documentation maker")
+parser.add_argument(
+    "--method", default="sft", choices=["sft", "dpo"], help="Choose the type of documentation to generate"
+)
+args = parser.parse_args()
 
 # This script generates a markdown document from the pydantic model of the finetuning config,
 # by converting it to a json schema and then to markdown.
@@ -10,20 +18,30 @@ import finetuning
 # NB: some of the naming in the output uses JSON conventions, which might be misleading.
 # E.g., "number" and "null" rather than "float" and "None". This should perhaps be modified.
 
-schema = finetuning.config.SFTExperimentConfig.model_json_schema()
+if args.method == "sft":
+    schema = finetuning.config.SFTExperimentConfig.model_json_schema()
+else:
+    schema = finetuning.config.DPOExperimentConfig.model_json_schema()
 markdown = jsonschema_markdown.generate(schema, hide_empty_columns=True, footer=False)
 
 # Replace the introduction with a custom one
-intro = """# Finetuning config structure and parameters
+intro = """# Finetuning config structure and parameters for {method}
 
-This document describes the structure of the finetuning configuration, and the parameters and values that can be defined there.
+This document describes the structure of the {method} finetuning configuration, and the parameters and values that can be defined there.
 
-See the finetuning config section [this config file](overrides/llama-31-tiny-random-deepspeed-values.yaml) for an example of a valid configuration.
+See the finetuning config section [this config file]({valid_file}) for an example of a valid configuration.
 See the various sub-configs for their options. Additional properties are not allowed.
 
 **Top-level properties:**
 
-"""
+""".format(
+    method=args.method.upper(),
+    valid_file=(
+        "overrides/llama-31-tiny-random-deepspeed-values.yaml"
+        if args.method == "sft"
+        else "overrides/tiny-llama-dpo-full-param.yaml"
+    ),
+)
 markdown = (
     intro + markdown[markdown.index("| Property | Type | Required | Possible values | Default | Description |") :]
 )
@@ -61,5 +79,5 @@ markdown = markdown.replace("> ⚠️ Additional properties are not allowed.\n\n
 # Make sure default "False" is shown for boolean parameters
 markdown = markdown.replace("`boolean` |  | boolean |  |", "`boolean` |  | boolean | `False` |")
 
-with open("ft_config_doc.md", "w") as f:
+with open(f"config_doc_{args.method}.md", "w") as f:
     f.write(markdown)
