@@ -218,6 +218,7 @@ run_conf:
     assert trainer_state["log_history"][-1]["loss"] < 4.0
 
 
+@pytest.mark.skip(reason="segmentation fault on GHA")
 def test_sft_mistral_lora(tmpdir):
     # 0. Config definition:
     config = """\
