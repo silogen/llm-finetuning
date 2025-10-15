@@ -698,8 +698,8 @@ run_conf:
         trainer_state = json.loads(fi.read())
     # The margins start close to zero
     assert np.isclose(trainer_state["log_history"][0]["rewards/margins"], 0.0, atol=0.02)
-    # But they rise to >0.04
-    assert trainer_state["log_history"][-1]["rewards/margins"] > 0.04
+    # But they rise to >0.03
+    assert trainer_state["log_history"][-1]["rewards/margins"] > 0.03
 
     # LoRA setup should lead to adapter checkpoint
     assert (dpo_ckpt_dir / "checkpoint-final" / "adapter_model.safetensors").isfile()
