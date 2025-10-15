@@ -10,7 +10,7 @@ on:
       - "docker/finetuning/rocm-silogen-finetuning-worker.Dockerfile"
       - "requirements.txt"
       - ".github/workflows/package.yml"
-      - "tests/"
+      - "tests/**"
 
 jobs:
   common:
