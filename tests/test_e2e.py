@@ -218,8 +218,7 @@ run_conf:
     assert trainer_state["log_history"][-1]["loss"] < 4.0
 
 
-@pytest.mark.skip(reason="segmentation fault on GHA")
-def test_sft_mistral_lora(tmpdir):
+def test_sft_gemma2_lora(tmpdir):
     # 0. Config definition:
     config = """\
 data_conf:
@@ -268,11 +267,11 @@ peft_conf:
       - v_proj
       - o_proj
 run_conf:
-  model: hf-internal-testing/tiny-random-MistralForCausalLM
+  model: hf-internal-testing/tiny-random-Gemma2ForCausalLM
   model_args:
     attn_implementation: "eager"
     use_cache: False
-    revision: 7517176934d50d00707900b92ef6a95c782e51a2
+    revision: de7c11b6c25d26ddd1bf4324fcf479b61d18e440
   resume_from_checkpoint: False
 """
     num_steps = 15
@@ -296,10 +295,10 @@ run_conf:
     # 3. Inspect results!
     with open(ckpt_dir / f"checkpoint-{num_steps}" / "trainer_state.json") as fi:
         trainer_state = json.loads(fi.read())
-    # At the start, loss should still be around -log(1/32002)~10.3, (Even the tiny Mistral has 32002 units after Chat-ML)
-    assert np.isclose(trainer_state["log_history"][0]["loss"], 10.3, atol=0.5)
-    # In current setup, loss goes at least below 2.5 by 15 steps
-    assert trainer_state["log_history"][-1]["loss"] < 2.5
+    # At the start, loss should still be around -log(1/256000)~12.4529327234617, (Even the tiny Gemma2 has 256000 units after Chat-ML)
+    assert np.isclose(trainer_state["log_history"][0]["loss"], 12.45, atol=0.5)
+    # In current setup, loss goes at least below 5.0 by 15 steps
+    assert trainer_state["log_history"][-1]["loss"] < 5.0
     # LoRA setup should lead to adapter checkpoint
     assert (ckpt_dir / "checkpoint-final" / "adapter_model.safetensors").isfile()
     # And since the basemodel vocab was modified, there is a new basemodel checkpoint too
@@ -311,7 +310,7 @@ def intercept_tokenizer_call(*args, overwrite_chat_template=False, **kwargs):
 
 
 @patch("finetuning.dpo.subsetup_tokenizer", intercept_tokenizer_call)
-def test_dpo_mistral(tmpdir):
+def test_dpo_gemma2(tmpdir):
     # 0. DPO Config definition:
     dpo_config = """\
 data_conf:
@@ -351,11 +350,11 @@ training_args:
 peft_conf:
   peft_type: "NO_PEFT"
 run_conf:
-  model: hf-internal-testing/tiny-random-MistralForCausalLM
+  model: hf-internal-testing/tiny-random-Gemma2ForCausalLM
   model_args:
     attn_implementation: "eager"
     use_cache: False
-    revision: 7517176934d50d00707900b92ef6a95c782e51a2
+    revision: de7c11b6c25d26ddd1bf4324fcf479b61d18e440
   resume_from_checkpoint: False
 """
     num_steps = 15
@@ -384,12 +383,12 @@ run_conf:
     with open(dpo_ckpt_dir / f"checkpoint-{num_steps}" / "trainer_state.json") as fi:
         trainer_state = json.loads(fi.read())
     # The margins start close to zero
-    assert np.isclose(trainer_state["log_history"][0]["rewards/margins"], 0.0, atol=0.1)
-    # But they rise to >0.10
-    assert trainer_state["log_history"][-1]["rewards/margins"] > 0.10
+    assert np.isclose(trainer_state["log_history"][0]["rewards/margins"], 0.0, atol=0.03)
+    # But they rise to >0.07
+    assert trainer_state["log_history"][-1]["rewards/margins"] > 0.07
 
 
-def test_sft_and_dpo_mistral(tmpdir):
+def test_sft_and_dpo_gemma2(tmpdir):
     # 0. Config definition:
     sft_config = """\
 data_conf:
@@ -428,11 +427,11 @@ sft_args:
 peft_conf:
   peft_type: "NO_PEFT"
 run_conf:
-  model: hf-internal-testing/tiny-random-MistralForCausalLM
+  model: hf-internal-testing/tiny-random-Gemma2ForCausalLM
   model_args:
     attn_implementation: "eager"
     use_cache: False
-    revision: 7517176934d50d00707900b92ef6a95c782e51a2
+    revision: de7c11b6c25d26ddd1bf4324fcf479b61d18e440
   resume_from_checkpoint: False
 """
     num_steps = 15
@@ -456,8 +455,8 @@ run_conf:
     # # 3. Inspect SFT results!
     with open(sft_ckpt_dir / f"checkpoint-{num_steps}" / "trainer_state.json") as fi:
         trainer_state = json.loads(fi.read())
-    # At the start, loss should still be around -log(1/32002)~10.3, (Even the tiny Mistral has 32002 units after Chat-ML)
-    assert np.isclose(trainer_state["log_history"][0]["loss"], 10.3, atol=0.5)
+    # At the start, loss should still be around -log(1/256000)~12.4529327234617, (Even the tiny Gemma2 has 256000 units after Chat-ML)
+    assert np.isclose(trainer_state["log_history"][0]["loss"], 12.45, atol=0.5)
     # In current setup, loss goes at least below 4.5 by 15 steps
     assert trainer_state["log_history"][-1]["loss"] < 4.5
 
@@ -535,12 +534,12 @@ run_conf:
     with open(dpo_ckpt_dir / f"checkpoint-{num_steps}" / "trainer_state.json") as fi:
         trainer_state = json.loads(fi.read())
     # The margins start close to zero
-    assert np.isclose(trainer_state["log_history"][0]["rewards/margins"], 0.0, atol=0.1)
-    # But they rise to >0.15
-    assert trainer_state["log_history"][-1]["rewards/margins"] > 0.15
+    assert np.isclose(trainer_state["log_history"][0]["rewards/margins"], 0.0, atol=0.03)
+    # But they rise to >0.07
+    assert trainer_state["log_history"][-1]["rewards/margins"] > 0.07
 
 
-def test_sft_and_dpo_lora_mistral(tmpdir):
+def test_sft_and_dpo_lora_gemma2(tmpdir):
     # 0. Config definition:
     sft_config = """\
 data_conf:
@@ -562,6 +561,7 @@ training_args:
   gradient_checkpointing_kwargs:
     use_reentrant: false
   learning_rate: 0.5
+  logging_first_step: True
   logging_steps: 1
   logging_strategy: "steps"
   lr_scheduler_type: "constant"
@@ -579,11 +579,11 @@ sft_args:
 peft_conf:
   peft_type: "NO_PEFT"
 run_conf:
-  model: hf-internal-testing/tiny-random-MistralForCausalLM
+  model: hf-internal-testing/tiny-random-Gemma2ForCausalLM
   model_args:
     attn_implementation: "eager"
     use_cache: False
-    revision: 7517176934d50d00707900b92ef6a95c782e51a2
+    revision: de7c11b6c25d26ddd1bf4324fcf479b61d18e440
   resume_from_checkpoint: False
 """
     num_steps = 15
@@ -607,8 +607,8 @@ run_conf:
     # 3. Inspect SFT results!
     with open(sft_ckpt_dir / f"checkpoint-{num_steps}" / "trainer_state.json") as fi:
         trainer_state = json.loads(fi.read())
-    # At the start, loss should still be around -log(1/32002)~10.3, (Even the tiny Mistral has 32002 units after Chat-ML)
-    assert np.isclose(trainer_state["log_history"][0]["loss"], 10.3, atol=0.5)
+    # At the start, loss should still be around -log(1/256000)~12.4529327234617, (Even the tiny Gemma2 has 256000 units after Chat-ML)
+    assert np.isclose(trainer_state["log_history"][0]["loss"], 12.45, atol=0.5)
     # In current setup, loss goes at least below 4.5 by 15 steps
     assert trainer_state["log_history"][-1]["loss"] < 4.5
 
@@ -696,9 +696,9 @@ run_conf:
     with open(dpo_ckpt_dir / f"checkpoint-{num_steps}" / "trainer_state.json") as fi:
         trainer_state = json.loads(fi.read())
     # The margins start close to zero
-    assert np.isclose(trainer_state["log_history"][0]["rewards/margins"], 0.0, atol=0.1)
-    # But they rise to >0.15
-    assert trainer_state["log_history"][-1]["rewards/margins"] > 0.15
+    assert np.isclose(trainer_state["log_history"][0]["rewards/margins"], 0.0, atol=0.03)
+    # But they rise to >0.07
+    assert trainer_state["log_history"][-1]["rewards/margins"] > 0.07
 
     # LoRA setup should lead to adapter checkpoint
     assert (dpo_ckpt_dir / "checkpoint-final" / "adapter_model.safetensors").isfile()
@@ -708,12 +708,12 @@ def test_generate(tmpdir):
     # 0. Config definition:
     generate_config = """\
 model_conf:
-  model: hf-internal-testing/tiny-random-MistralForCausalLM
+  model: hf-internal-testing/tiny-random-Gemma2ForCausalLM
   model_args:
     attn_implementation: "eager"
     use_cache: False
     device_map: cpu
-    revision: 7517176934d50d00707900b92ef6a95c782e51a2
+    revision: de7c11b6c25d26ddd1bf4324fcf479b61d18e440
 prompt_conf:
   type: "open-input"
   input: "Hi my name is "
@@ -726,4 +726,4 @@ hf_gen_params:
     finetuning.cli.generation_cli([str(tmpdir / "gen_conf.yaml"), str(tmpdir / "generated_output.yaml")])
     with open(tmpdir / "generated_output.yaml") as fin:
         list_of_outputs = yaml.safe_load(fin)
-    assert list_of_outputs[0]["answer"] == "Bod OFF soon FT"  # This is what tiny-random-MistralForCausalLM replies.
+    assert list_of_outputs[0]["answer"] == "amientosamientosérômeérôme"  # This is what tiny-random-Gemma2 replies.
