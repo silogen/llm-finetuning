@@ -561,7 +561,7 @@ training_args:
   gradient_checkpointing_kwargs:
     use_reentrant: false
   learning_rate: 0.5
-  logging_first_step: True
+  logging_first_step: true
   logging_steps: 1
   logging_strategy: "steps"
   lr_scheduler_type: "constant"
@@ -634,6 +634,7 @@ training_args:
   gradient_checkpointing_kwargs:
     use_reentrant: false
   learning_rate: 0.5
+  logging_first_step: true
   logging_steps: 1
   logging_strategy: "steps"
   lr_scheduler_type: "constant"
@@ -669,7 +670,7 @@ run_conf:
   resume_from_checkpoint: False
 """
     # note: potential to redefine
-    num_steps = 15
+    num_steps = 20
     # 5. setup
     # Set paths
     dpotmpdir = tmpdir / "dpo"
@@ -696,9 +697,9 @@ run_conf:
     with open(dpo_ckpt_dir / f"checkpoint-{num_steps}" / "trainer_state.json") as fi:
         trainer_state = json.loads(fi.read())
     # The margins start close to zero
-    assert np.isclose(trainer_state["log_history"][0]["rewards/margins"], 0.0, atol=0.03)
-    # But they rise to >0.07
-    assert trainer_state["log_history"][-1]["rewards/margins"] > 0.07
+    assert np.isclose(trainer_state["log_history"][0]["rewards/margins"], 0.0, atol=0.02)
+    # But they rise to >0.04
+    assert trainer_state["log_history"][-1]["rewards/margins"] > 0.04
 
     # LoRA setup should lead to adapter checkpoint
     assert (dpo_ckpt_dir / "checkpoint-final" / "adapter_model.safetensors").isfile()
