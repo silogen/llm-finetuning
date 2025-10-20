@@ -143,7 +143,10 @@ class SilogenDPOConfig(BaseConfig, DPOConfig):
     The list of training arguments is best available online (the version might not be up-to-date here):
     https://huggingface.co/docs/transformers/main/en/main_classes/trainer#transformers.TrainingArguments
 
-    The TrainingArguments object does a lot of things besides specifying the training configuaration options (e.g. it
+    Additionally, the DPOConfig has arguments specific to DPO training, which can be found here:
+    https://huggingface.co/docs/trl/main/en/dpo_trainer#trl.DPOConfig
+
+    The object does a lot of things besides specifying the training configuaration options (e.g. it
     has computed properties like true training batch size etc.)
 
     NOTE:
