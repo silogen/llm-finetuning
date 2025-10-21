@@ -82,7 +82,7 @@ HuggingFace TrainingArguments as Config with additional SiloGen conventions
 The list of training arguments is best available online (the version might not be up-to-date here):
 https://huggingface.co/docs/transformers/v{transformers_version}/en/main_classes/trainer#transformers.TrainingArguments
 
-The TrainingArguments object does a lot of things besides specifying the training configuaration options (e.g. it
+The TrainingArguments object does a lot of things besides specifying the training configuration options (e.g. it
 has computed properties like true training batch size etc.)
 """.format(
     transformers_version=transformers_version
@@ -97,7 +97,7 @@ https://huggingface.co/docs/transformers/v{transformers_version}/en/main_classes
 Additionally, the DPOConfig has arguments specific to DPO training, which can be found here:
 https://huggingface.co/docs/trl/v{trl_version}/en/dpo_trainer#trl.DPOConfig
 
-The object does a lot of things besides specifying the training configuaration options (e.g. it
+The object does a lot of things besides specifying the training configuration options (e.g. it
 has computed properties like true training batch size etc.)
 """.format(
     transformers_version=transformers_version, trl_version=trl_version

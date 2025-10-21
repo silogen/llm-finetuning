@@ -58,7 +58,7 @@ class SilogenTrainingArguments(BaseConfig, transformers.TrainingArguments):
     gradient_accumulation_steps, per_device_train_batch_size, pre_device_eval_batch_size are all set automatically,
     based on the separate BatchsizeConfig, and cannot be modified in this config.
 
-    The TrainingArguments object does a lot of things besides specifying the training configuaration options
+    The TrainingArguments object does a lot of things besides specifying the training configuration options
         (e.g. it holds a reference to some distributed computation state)
     """
 
@@ -146,7 +146,7 @@ class SilogenDPOConfig(BaseConfig, DPOConfig):
     Additionally, the DPOConfig has arguments specific to DPO training, which can be found here:
     https://huggingface.co/docs/trl/main/en/dpo_trainer#trl.DPOConfig
 
-    The object does a lot of things besides specifying the training configuaration options (e.g. it
+    The object does a lot of things besides specifying the training configuration options (e.g. it
     has computed properties like true training batch size etc.)
 
     NOTE:
