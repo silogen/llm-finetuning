@@ -202,6 +202,16 @@ class SilogenDPOConfig(BaseConfig, DPOConfig):
     # The following are DPOConfig-specific args:
     max_length: int = Field(default=2048, description="Maximum total length of inputs")
     max_prompt_length: int = Field(default=1536, description="Maximum prompt length")
+    loss_type: str | list[str] = field(
+        default_factory=lambda: ["sigmoid"],
+        metadata={
+            "help": "Type of loss to use. Possible values are: `'sigmoid'`, `'hinge'`, `'ipo'`, `'exo_pair'`, "
+            "`'nca_pair'`, `'robust'`, `'bco_pair'`, `'sppo_hard'`, `'aot'`, `'aot_pair'`, `'discopop'`, "
+            "`'apo_zero'`, `'apo_down'` and `'sft'`. Multiple loss types can be combined using comma separation "
+            "(e.g., `['sigmoid', 'bco_pair', 'sft']` for MPO). The `loss_weights` parameter can be used to specify "
+            "corresponding weights for each loss type."
+        },
+    )
 
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):

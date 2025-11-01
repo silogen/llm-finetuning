@@ -1,9 +1,9 @@
 accelerate==1.9.0
 pydantic>=2.5,<3.0
 torch==2.6.0  # If torch version is changed, also update in docker/rocm-silogen-finetuning-base.Dockerfile
-transformers[tokenizers]==4.53.0  # If transformers version is changed, also update in docker/rocm-silogen-finetuning-base.Dockerfile
+transformers[tokenizers]==4.57.1  # If transformers version is changed, also update in docker/rocm-silogen-finetuning-base.Dockerfile
 datasets==3.2.0
-trl==0.13.0
+trl==0.24.0
 mlflow==2.21.3
 peft==0.16.0
 ruamel.yaml>0.15.0,<1.0
