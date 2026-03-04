@@ -1,4 +1,4 @@
-FROM rocm/vllm:rocm6.4.1_vllm_0.9.1_20250715
+FROM rocm/vllm:rocm/vllm:rocm7.0.0_vllm_0.11.2_20251210
 
 ARG DEBIAN_FRONTEND=noninteractive
 

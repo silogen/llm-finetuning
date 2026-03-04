@@ -7,6 +7,7 @@ set -eu
 DEFAULT_REGISTRY=ghcr.io/silogen
 REGISTRY=${REGISTRY:-$DEFAULT_REGISTRY}
 SKIP_PUSH=${SKIP_PUSH:-"false"}
+BUILD_TARGET=${BUILD_TARGET:-linux/amd64}
 
 if [ "$#" -ne 2 ]; then
   echo "Usage: $0 <platform> <tag>"
@@ -27,8 +28,8 @@ tmp_worker_dockerfile=$(mktemp docker/tmp.$platform-silogen-finetuning-worker.Do
 trap 'rm -f "$tmp_worker_dockerfile"' EXIT
 sed "s,FROM $DEFAULT_REGISTRY/$platform-silogen-finetuning-base:main,FROM $REGISTRY/$platform-silogen-finetuning-base:$tag,g" \
   docker/$platform-silogen-finetuning-worker.Dockerfile > $tmp_worker_dockerfile
-docker build -f docker/$platform-silogen-finetuning-base.Dockerfile -t "$REGISTRY/$platform-silogen-finetuning-base:$tag" .
-docker build -f $tmp_worker_dockerfile -t "$REGISTRY/$platform-silogen-finetuning-worker:$tag" --build-arg tag="$tag" .
+docker build --platform $BUILD_TARGET -f docker/$platform-silogen-finetuning-base.Dockerfile -t "$REGISTRY/$platform-silogen-finetuning-base:$tag" .
+docker build --platform $BUILD_TARGET -f $tmp_worker_dockerfile -t "$REGISTRY/$platform-silogen-finetuning-worker:$tag" --build-arg tag="$tag" .
 if [ ! $SKIP_PUSH == "true" ]; then
   docker push "$REGISTRY/$platform-silogen-finetuning-base:$tag"
   docker push "$REGISTRY/$platform-silogen-finetuning-worker:$tag"
