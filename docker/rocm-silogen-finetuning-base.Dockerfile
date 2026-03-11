@@ -25,9 +25,6 @@ ENV PATH="${PATH}:/minio-binaries/:/root/scripts/"
 RUN pip install /opt/rocm/share/amd_smi
 
 RUN pip install --no-cache-dir transformers[tokenizers]==4.57.3 \
-    && pip install --no-cache-dir --force-reinstall \
-    'https://github.com/bitsandbytes-foundation/bitsandbytes/releases/download/continuous-release_multi-backend-refactor/bitsandbytes-1.0.0-py3-none-manylinux_2_24_x86_64.whl' \
-    --no-deps \
     --trusted-host "github.com" \
     --trusted-host "release-assets.githubusercontent.com" \
     && pip install --no-cache-dir deepspeed tensorboard
