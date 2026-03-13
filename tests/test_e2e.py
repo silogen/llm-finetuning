@@ -1,7 +1,7 @@
 """This file contains tests that run the full E2E setups and train for a few updates
 
 NOTE: These tests should move to our E2E testing framework once we have the necessary things in place (workload engine,
-etc.) - see this ticket: https://silogen.atlassian.net/browse/SDX-344
+etc.)
 
 TIPS:
 - Inject something like this in the tests at the start to inspect the intermediate results:
@@ -55,7 +55,7 @@ def test_sft_gpt_lora(tmpdir):
     # 0. Config definition:
     config = """\
 data_conf:
-  chat_template_name: "chat-ml"
+  chat_template_name: "keep-original"
   training_data:
     type: CONCATENATION
     datasets:
@@ -98,11 +98,11 @@ peft_conf:
       - c_attn
     fan_in_fan_out: true
 run_conf:
-  model: hf-internal-testing/tiny-random-gpt2
+  model: hf-internal-testing/tiny-random-LlamaForCausalLM
   model_args:
     attn_implementation: "eager"
     use_cache: False
-    revision: 91c0fe31d692dd8448d9bc06e8d1877345009e3b
+    revision: 9fb191250dd56d0ba7ec9785a025ed29c03d5998
   resume_from_checkpoint: False
   determinism: "full"
 """
@@ -127,8 +127,9 @@ run_conf:
     # 3. Inspect results!
     with open(ckpt_dir / f"checkpoint-{num_steps}" / "trainer_state.json") as fi:
         trainer_state = json.loads(fi.read())
-    # At the start, loss should still be around -log(1/1002)~6.9, (1002 is the number of units)
-    assert np.isclose(trainer_state["log_history"][0]["loss"], 6.9, atol=0.5)
+    # At the start, loss should still be around -log(1/32000)~10.3, (32000 is the number of units)
+    #  see: http://karpathy.github.io/2019/04/25/recipe/  -> verify loss @ init
+    assert np.isclose(trainer_state["log_history"][0]["loss"], 10.3, atol=0.5)
     # In current setup, loss goes at least below 3.0 by 15 steps
     assert trainer_state["log_history"][-1]["loss"] < 3.0
 
@@ -142,7 +143,7 @@ def test_sft_gpt(tmpdir):
     # 0. Config definition:
     config = """\
 data_conf:
-  chat_template_name: "chat-ml"
+  chat_template_name: "keep-original"
   training_data:
     type: "PRECOMPUTE_WEIGHTED_MIX"
     datasets:
@@ -180,11 +181,11 @@ sft_args:
 peft_conf:
   peft_type: "NO_PEFT"
 run_conf:
-  model: hf-internal-testing/tiny-random-gpt2
+  model: hf-internal-testing/tiny-random-LlamaForCausalLM
   model_args:
     attn_implementation: "eager"
     use_cache: False
-    revision: 91c0fe31d692dd8448d9bc06e8d1877345009e3b
+    revision: 9fb191250dd56d0ba7ec9785a025ed29c03d5998
   resume_from_checkpoint: False
   determinism: "half"
 """
@@ -211,9 +212,9 @@ run_conf:
     with open(ckpt_dir / f"checkpoint-{num_steps}" / "trainer_state.json") as fi:
         trainer_state = json.loads(fi.read())
 
-    # At the start, loss should still be around -log(1/1002)~6.9, (1002 is the number of units)
+    # At the start, loss should still be around -log(1/32000)~10.3, (32000 is the number of units)
     #  see: http://karpathy.github.io/2019/04/25/recipe/  -> verify loss @ init
-    assert np.isclose(trainer_state["log_history"][0]["loss"], 6.9, atol=0.5)
+    assert np.isclose(trainer_state["log_history"][0]["loss"], 10.3, atol=0.5)
     # In current setup, loss goes at least below 4.0 by 15 steps
     assert trainer_state["log_history"][-1]["loss"] < 4.0
 
@@ -222,7 +223,7 @@ def test_sft_gemma2_lora(tmpdir):
     # 0. Config definition:
     config = """\
 data_conf:
-  chat_template_name: "chat-ml"
+  chat_template_name: "keep-original"
   training_data:
     type: CONCATENATION
     datasets:
@@ -267,11 +268,11 @@ peft_conf:
       - v_proj
       - o_proj
 run_conf:
-  model: hf-internal-testing/tiny-random-Gemma2ForCausalLM
+  model: hf-internal-testing/tiny-random-LlamaForCausalLM
   model_args:
     attn_implementation: "eager"
     use_cache: False
-    revision: de7c11b6c25d26ddd1bf4324fcf479b61d18e440
+    revision: 9fb191250dd56d0ba7ec9785a025ed29c03d5998
   resume_from_checkpoint: False
 """
     num_steps = 15
@@ -295,8 +296,9 @@ run_conf:
     # 3. Inspect results!
     with open(ckpt_dir / f"checkpoint-{num_steps}" / "trainer_state.json") as fi:
         trainer_state = json.loads(fi.read())
-    # At the start, loss should still be around -log(1/256000)~12.4529327234617, (Even the tiny Gemma2 has 256000 units after Chat-ML)
-    assert np.isclose(trainer_state["log_history"][0]["loss"], 12.45, atol=0.5)
+    # At the start, loss should still be around -log(1/32000)~10.3, (32000 is the number of units)
+    #  see: http://karpathy.github.io/2019/04/25/recipe/  -> verify loss @ init
+    assert np.isclose(trainer_state["log_history"][0]["loss"], 10.3, atol=0.5)
     # In current setup, loss goes at least below 5.0 by 15 steps
     assert trainer_state["log_history"][-1]["loss"] < 5.0
     # LoRA setup should lead to adapter checkpoint
@@ -350,11 +352,11 @@ training_args:
 peft_conf:
   peft_type: "NO_PEFT"
 run_conf:
-  model: hf-internal-testing/tiny-random-Gemma2ForCausalLM
+  model: hf-internal-testing/tiny-random-LlamaForCausalLM
   model_args:
     attn_implementation: "eager"
     use_cache: False
-    revision: de7c11b6c25d26ddd1bf4324fcf479b61d18e440
+    revision: 9fb191250dd56d0ba7ec9785a025ed29c03d5998
   resume_from_checkpoint: False
 """
     num_steps = 15
@@ -392,7 +394,7 @@ def test_sft_and_dpo_gemma2(tmpdir):
     # 0. Config definition:
     sft_config = """\
 data_conf:
-  chat_template_name: "chat-ml"
+  chat_template_name: "keep-original"
   training_data:
     type: CONCATENATION
     datasets:
@@ -427,11 +429,11 @@ sft_args:
 peft_conf:
   peft_type: "NO_PEFT"
 run_conf:
-  model: hf-internal-testing/tiny-random-Gemma2ForCausalLM
+  model: hf-internal-testing/tiny-random-LlamaForCausalLM
   model_args:
     attn_implementation: "eager"
     use_cache: False
-    revision: de7c11b6c25d26ddd1bf4324fcf479b61d18e440
+    revision: 9fb191250dd56d0ba7ec9785a025ed29c03d5998
   resume_from_checkpoint: False
 """
     num_steps = 15
@@ -455,8 +457,9 @@ run_conf:
     # # 3. Inspect SFT results!
     with open(sft_ckpt_dir / f"checkpoint-{num_steps}" / "trainer_state.json") as fi:
         trainer_state = json.loads(fi.read())
-    # At the start, loss should still be around -log(1/256000)~12.4529327234617, (Even the tiny Gemma2 has 256000 units after Chat-ML)
-    assert np.isclose(trainer_state["log_history"][0]["loss"], 12.45, atol=0.5)
+    # At the start, loss should still be around -log(1/32000)~10.3, (32000 is the number of units)
+    #  see: http://karpathy.github.io/2019/04/25/recipe/  -> verify loss @ init
+    assert np.isclose(trainer_state["log_history"][0]["loss"], 10.3, atol=0.5)
     # In current setup, loss goes at least below 4.5 by 15 steps
     assert trainer_state["log_history"][-1]["loss"] < 4.5
 
@@ -464,7 +467,7 @@ run_conf:
     # 4. DPO Config definition:
     dpo_config = """\
 data_conf:
-  chat_template_name: "chat-ml"
+  chat_template_name: "keep-original"
   training_data:
     type: CONCATENATION
     datasets:
@@ -543,7 +546,7 @@ def test_sft_and_dpo_lora_gemma2(tmpdir):
     # 0. Config definition:
     sft_config = """\
 data_conf:
-  chat_template_name: "chat-ml"
+  chat_template_name: "keep-original"
   training_data:
     type: CONCATENATION
     datasets:
@@ -579,11 +582,11 @@ sft_args:
 peft_conf:
   peft_type: "NO_PEFT"
 run_conf:
-  model: hf-internal-testing/tiny-random-Gemma2ForCausalLM
+  model: hf-internal-testing/tiny-random-LlamaForCausalLM
   model_args:
     attn_implementation: "eager"
     use_cache: False
-    revision: de7c11b6c25d26ddd1bf4324fcf479b61d18e440
+    revision: 9fb191250dd56d0ba7ec9785a025ed29c03d5998
   resume_from_checkpoint: False
 """
     num_steps = 15
@@ -607,8 +610,9 @@ run_conf:
     # 3. Inspect SFT results!
     with open(sft_ckpt_dir / f"checkpoint-{num_steps}" / "trainer_state.json") as fi:
         trainer_state = json.loads(fi.read())
-    # At the start, loss should still be around -log(1/256000)~12.4529327234617, (Even the tiny Gemma2 has 256000 units after Chat-ML)
-    assert np.isclose(trainer_state["log_history"][0]["loss"], 12.45, atol=0.5)
+    # At the start, loss should still be around -log(1/32000)~10.3, (32000 is the number of units)
+    #  see: http://karpathy.github.io/2019/04/25/recipe/  -> verify loss @ init
+    assert np.isclose(trainer_state["log_history"][0]["loss"], 10.3, atol=0.5)
     # In current setup, loss goes at least below 4.5 by 15 steps
     assert trainer_state["log_history"][-1]["loss"] < 4.5
 
@@ -616,7 +620,7 @@ run_conf:
     # 4. DPO Config definition:
     dpo_config = """\
 data_conf:
-  chat_template_name: "chat-ml"
+  chat_template_name: "keep-original"
   training_data:
     type: CONCATENATION
     datasets:

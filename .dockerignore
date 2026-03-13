@@ -7,7 +7,6 @@
 **/.mypy_cache
 **/build
 **/html/*
-**/tests
 **/tmp_trainer
 **/venv
 
