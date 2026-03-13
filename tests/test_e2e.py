@@ -249,7 +249,7 @@ training_args:
   gradient_checkpointing: false
   gradient_checkpointing_kwargs:
     use_reentrant: false
-  learning_rate: 0.5
+  learning_rate: 1.5
   logging_steps: 1
   logging_strategy: "steps"
   lr_scheduler_type: "constant"
