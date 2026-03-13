@@ -101,7 +101,6 @@ peft_conf:
       - k_proj
       - v_proj
       - o_proj
-    fan_in_fan_out: true
 run_conf:
   model: hf-internal-testing/tiny-random-LlamaForCausalLM
   model_args:
