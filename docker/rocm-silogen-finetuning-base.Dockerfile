@@ -16,7 +16,6 @@ RUN groupadd -g ${GROUP_ID} ${GROUP_NAME} && \
 # Install minio
 RUN curl https://dl.min.io/client/mc/release/linux-amd64/mc \
     --create-dirs \
-    --insecure \
     -o /minio-binaries/mc && \
     chown -hR ${USER_NAME} /minio-binaries/ && \
     chmod +x /minio-binaries/mc
@@ -25,6 +24,4 @@ ENV PATH="${PATH}:/minio-binaries/:/root/scripts/"
 RUN pip install /opt/rocm/share/amd_smi
 
 RUN pip install --no-cache-dir transformers[tokenizers]==4.57.3 \
-    --trusted-host "github.com" \
-    --trusted-host "release-assets.githubusercontent.com" \
     && pip install --no-cache-dir deepspeed tensorboard
