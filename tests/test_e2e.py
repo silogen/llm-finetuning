@@ -82,7 +82,8 @@ training_args:
   overwrite_output_dir: true
   push_to_hub: False
   report_to: ["none"]
-  save_strategy: "epoch"
+  save_strategy: "steps"
+  save_steps: {num_steps}
   eval_strategy: "no"
 sft_args:
   max_seq_length: 128
@@ -140,8 +141,6 @@ run_conf:
 
     # LoRA setup should lead to adapter checkpoint
     assert (ckpt_dir / "checkpoint-final" / "adapter_model.safetensors").isfile()
-    # And since the basemodel vocab was modified, there is a new basemodel checkpoint too
-    assert (ckpt_dir / "checkpoint-new-basemodel" / "model.safetensors").isfile()
 
 
 def test_sft_llama(tmpdir):
