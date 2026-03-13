@@ -72,7 +72,7 @@ training_args:
   gradient_checkpointing: false
   gradient_checkpointing_kwargs:
     use_reentrant: false
-  learning_rate: 0.5
+  learning_rate: 3.0
   logging_steps: 1
   logging_strategy: "steps"
   lr_scheduler_type: "constant"
@@ -82,8 +82,7 @@ training_args:
   overwrite_output_dir: true
   push_to_hub: False
   report_to: ["none"]
-  save_strategy: "steps"
-  save_steps: 1
+  save_strategy: "epoch"
   eval_strategy: "no"
 sft_args:
   max_seq_length: 128
@@ -101,6 +100,8 @@ peft_conf:
       - k_proj
       - v_proj
       - o_proj
+      - lm_head
+      - embed_tokens
 run_conf:
   model: hf-internal-testing/tiny-random-LlamaForCausalLM
   model_args:
