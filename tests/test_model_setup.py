@@ -3,7 +3,14 @@ import torch
 
 from finetuning.model import _init_new_rows_by_avg_sample
 
+try:
+    torch.linalg.cholesky(torch.randn(3, 3))
+    CHOLESKY_AVAILABLE = True
+except RuntimeError:
+    CHOLESKY_AVAILABLE = False
 
+
+@pytest.mark.skipif(not CHOLESKY_AVAILABLE, reason="Cholesky decomposition not available in this PyTorch installation")
 def test_init_new_rows_by_avg_sample_constant_first_rows():
     weights = torch.tensor(
         [
@@ -18,6 +25,7 @@ def test_init_new_rows_by_avg_sample_constant_first_rows():
     assert torch.equal(weights, new_weights[0:3, :])
 
 
+@pytest.mark.skipif(not CHOLESKY_AVAILABLE, reason="Cholesky decomposition not available in this PyTorch installation")
 def test_init_new_rows_by_avg_sample_changed_last_rows():
     weights = torch.tensor(
         [
@@ -32,6 +40,7 @@ def test_init_new_rows_by_avg_sample_changed_last_rows():
     assert not torch.equal(new_weights[3:4, :], torch.zeros((2, 3)))
 
 
+@pytest.mark.skipif(not CHOLESKY_AVAILABLE, reason="Cholesky decomposition not available in this PyTorch installation")
 def test_init_new_rows_by_avg_sample_close_to_mean():
     # NOTE: this test could technically fail as the new rows are sampled. Statistically this should happen like once in
     # a million years

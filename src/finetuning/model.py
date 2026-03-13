@@ -68,6 +68,11 @@ def _init_new_rows_by_avg_sample(weights, num_new_rows, sigma_scale=1e-5):
         # covariance needs to be positive definite, add some noise to diagonal
         sigma += torch.eye(n) * sigma_scale
         dist = torch.distributions.multivariate_normal.MultivariateNormal(mu, covariance_matrix=sigma_scale * sigma)
+    except RuntimeError as e:
+        if "Calling torch.linalg.cholesky on a CPU tensor requires compiling PyTorch with LAPACK." in str(e):
+            raise ValueError("Embedding extension not available with the current PyTorch installation.") from e
+        else:
+            raise e
     new_rows = torch.stack(tuple((dist.sample() for _ in range(num_new_rows))), dim=0).to(weights_dtype)
     if not is_deepspeed_zero3_enabled():
         weights[n:, :] = new_rows
@@ -107,7 +112,13 @@ def grow_embeddings(model, new_num_tokens, approach="hf_default"):
         return []
     elif is_quantized(model):
         raise ValueError("Quantized layers can be grown, but they cannot be trained or saved, so this will not work!")
-    model.resize_token_embeddings(new_num_tokens=new_num_tokens, mean_resizing=(approach != "hf_legacy"))
+    try:
+        model.resize_token_embeddings(new_num_tokens=new_num_tokens, mean_resizing=(approach != "hf_legacy"))
+    except RuntimeError as e:
+        if "Calling torch.linalg.cholesky on a CPU tensor requires compiling PyTorch with LAPACK." in str(e):
+            raise ValueError("Embedding extension not available with the current PyTorch installation.") from e
+        else:
+            raise e
     if approach == "sample_avg_emb":
         with torch.no_grad():  # The operations may otherwise leave some gradient compute graph fluff behind.
             input_embeddings = model.get_input_embeddings()
