@@ -1,4 +1,4 @@
-FROM rocm/vllm:rocm6.4.1_vllm_0.9.1_20250715
+FROM rocm/vllm:rocm7.0.0_vllm_0.11.2_20251210
 
 ARG DEBIAN_FRONTEND=noninteractive
 
@@ -23,8 +23,5 @@ RUN curl https://dl.min.io/client/mc/release/linux-amd64/mc \
 ENV PATH="${PATH}:/minio-binaries/:/root/scripts/"
 RUN pip install /opt/rocm/share/amd_smi
 
-RUN pip install --no-cache-dir transformers[tokenizers]==4.53.0 \
-    && pip install --no-cache-dir --force-reinstall \
-    'https://github.com/bitsandbytes-foundation/bitsandbytes/releases/download/continuous-release_multi-backend-refactor/bitsandbytes-1.0.0-py3-none-manylinux_2_24_x86_64.whl' \
-    --no-deps \
+RUN pip install --no-cache-dir transformers[tokenizers]==4.57.3 \
     && pip install --no-cache-dir deepspeed tensorboard
