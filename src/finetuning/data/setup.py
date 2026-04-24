@@ -71,7 +71,7 @@ def setup_datainput(conf: DataInput) -> Dataset | None:
 
 
 def filter_long_examples(data, max_len):
-    """Filters out examples that are too long.
+    """Filters out examples that are too long, SFT specific
 
     Based on the 'input_ids' key, i.e. after tokenization, or 'length' if that exists.
     """

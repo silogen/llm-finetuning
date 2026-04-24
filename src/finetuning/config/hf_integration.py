@@ -1,6 +1,7 @@
 """HuggingFace Configs available through the config interface"""
 
 from dataclasses import dataclass, field
+from textwrap import dedent
 from typing import Any, Dict, List, Literal, Optional, Union
 
 import peft
@@ -263,7 +264,16 @@ class SFTArguments(BaseConfig):
     """Supervised fine-tuning arguments"""
 
     max_seq_length: int = Field(
-        default=2048, description="Maximum length input sequence length. Longer sequences will be filtered out."
+        default=2048,
+        description="Maximum length input sequence length. Longer sequences will be filtered or truncated.",
+    )
+    length_handling: Literal["filter", "truncate"] = Field(
+        default="filter",
+        description=dedent(
+            """How to handle examples that are longer than max_seq_length. \
+            'filter': Filter out these examples from the training set. \
+            'truncate': Truncate these examples to max_seq_length. Note that this might lead to loss of information and worse performance, especially if the important information is at the end of the sequence."""
+        ),
     )
     # This is only used if a new basemodel needs to be saved, e.g. if the embeddings are grown to account for new
     # tokens.

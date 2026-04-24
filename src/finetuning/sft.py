@@ -97,19 +97,25 @@ logger = logging.get_logger("sft")
 def subsetup_sft_training_data(exp_conf: SFTExperimentConfig, tokenizer):
     """Setup step: Training data"""
     train_data = setup_datainput(exp_conf.data_conf.training_data)
-    train_data = tokenize_with_chat_template(train_data, tokenizer)
-    # Train data might be an iterable dataset, in which case we do not know how many samples get filtered out.
-    # Let's still send out a warning when we can, the extra information is useful.
-    if getattr(train_data, "num_rows", None) is not None:
-        train_len_before_filter = train_data.num_rows
-    train_data = filter_long_examples(train_data, exp_conf.sft_args.max_seq_length)
-    if getattr(train_data, "num_rows", None) is not None and train_len_before_filter > train_data.num_rows:
-        logger.warning(
-            f"Filtered out {train_len_before_filter - train_data.num_rows} training examples "
-            f"due to exceeding maximum sequence length {exp_conf.sft_args.max_seq_length}. "
-            "Note that this warning is not emitted with iterable (streaming) datasets, but the filtering still takes "
-            "place."
-        )
+    train_data = tokenize_with_chat_template(
+        train_data,
+        tokenizer,
+        truncation=exp_conf.sft_args.length_handling == "truncate",
+        max_len=exp_conf.sft_args.max_seq_length,
+    )
+    if exp_conf.sft_args.length_handling == "filter":
+        # Train data might be an iterable dataset, in which case we do not know how many samples get filtered out.
+        # Let's still send out a warning when we can, the extra information is useful.
+        if getattr(train_data, "num_rows", None) is not None:
+            train_len_before_filter = train_data.num_rows
+        train_data = filter_long_examples(train_data, exp_conf.sft_args.max_seq_length)
+        if getattr(train_data, "num_rows", None) is not None and train_len_before_filter > train_data.num_rows:
+            logger.warning(
+                f"Filtered out {train_len_before_filter - train_data.num_rows} training examples "
+                f"due to exceeding maximum sequence length {exp_conf.sft_args.max_seq_length}. "
+                "Note that this warning is not emitted with iterable (streaming) datasets, but the filtering still takes "
+                "place."
+            )
     return train_data
 
 
@@ -126,14 +132,20 @@ def subsetup_sft_validation_data(exp_conf: SFTExperimentConfig, tokenizer, train
         valid_data = setup_datainput(exp_conf.data_conf.validation_data)
         if valid_data is None:
             return train_data, None
-        valid_data = tokenize_with_chat_template(valid_data, tokenizer)
-        valid_len_before_filter = valid_data.num_rows
-        valid_data = filter_long_examples(valid_data, exp_conf.sft_args.max_seq_length)
-        if valid_len_before_filter > valid_data.num_rows:
-            logger.warning(
-                f"Filtered out {valid_len_before_filter - valid_data.num_rows} validation examples "
-                f"due to exceeding maximum sequence length {exp_conf.sft_args.max_seq_length}."
-            )
+        valid_data = tokenize_with_chat_template(
+            valid_data,
+            tokenizer,
+            truncation=exp_conf.sft_args.length_handling == "truncate",
+            max_len=exp_conf.sft_args.max_seq_length,
+        )
+        if exp_conf.sft_args.length_handling == "filter":
+            valid_len_before_filter = valid_data.num_rows
+            valid_data = filter_long_examples(valid_data, exp_conf.sft_args.max_seq_length)
+            if valid_len_before_filter > valid_data.num_rows:
+                logger.warning(
+                    f"Filtered out {valid_len_before_filter - valid_data.num_rows} validation examples "
+                    f"due to exceeding maximum sequence length {exp_conf.sft_args.max_seq_length}."
+                )
     valid_data = sort_longest_first(valid_data)
     return train_data, valid_data
 
