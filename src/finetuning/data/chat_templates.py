@@ -114,10 +114,10 @@ def get_chat_template(name: ChatTemplateName):
         raise ValueError(f"Unknown chat-template: {name}")
 
 
-def tokenize_with_chat_template(dataset, tokenizer):
+def tokenize_with_chat_template(dataset, tokenizer, truncation=False, max_len=None):
     """Applies the chat template that is stored in the tokenizer to each example in a dataset"""
 
-    def _apply_chat_template(example, tokenizer=tokenizer):
+    def _apply_chat_template(example, tokenizer=tokenizer, truncation=truncation, max_len=max_len):
         """Actually does the templating, adds 'text' and 'length'
 
         Keeps tokenizer in scope as default argument
@@ -125,6 +125,8 @@ def tokenize_with_chat_template(dataset, tokenizer):
         conversation_string = tokenizer.apply_chat_template(example["messages"], tokenize=False)
         tokenized = tokenizer(
             conversation_string,
+            truncation=truncation,
+            max_length=max_len,
         )
         tokenized["length"] = len(tokenized["input_ids"])
         return tokenized

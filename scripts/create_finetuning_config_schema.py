@@ -24,9 +24,6 @@ schema["$defs"]["BatchsizeConfig"]["properties"]["total_train_batch_size"]["anyO
     {"type": "null"},
 ]
 
-# Remove const from torch_dtype (it's not a constant - this is a surprising pydantic output)
-del schema["$defs"]["ModelArguments"]["properties"]["torch_dtype"]["const"]
-
 print("NOTE: only $defs, add these to the schema.json in the appropriate place")
 print("---")
 for line in indent(json.dumps({"$defs": schema["$defs"]}, indent=2), 2 * " ").splitlines()[1:-2]:
