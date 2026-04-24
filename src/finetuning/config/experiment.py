@@ -115,13 +115,6 @@ class ExperimentConfig(BaseConfig):
 
     def model_post_init(self, __context):
         self.__apply_overrides()
-        if self.training_args.gradient_checkpointing and self.run_conf.model_args.use_cache:
-            # These are mutually incompatible
-            logger.warning(
-                "Setting run_conf.model_args.use_cache=False, because training_args.gradient_checkpointing=True"
-            )
-            self.run_conf.model_args.use_cache = False
-
         if (
             self.quant_conf.quantization_type == QuantizationType.BITSANDBYTES
             and is_fsdp
