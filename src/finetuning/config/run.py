@@ -77,7 +77,7 @@ class ModelArguments(BaseConfig):
 
     use_cache: Optional[bool] = Field(
         default=None,
-        description="If set, forwards use_cache to Transformers. Leave as null to use the model default. This is mutually exclusive with gradient_checkpointing when set to true.",
+        description="Saves generated hidden states to speed up generation, see: https://discuss.huggingface.co/t/what-is-the-purpose-of-use-cache-in-decoder/958. Default is None (unset). This is mutually exclusive with gradient_checkpointing.",
     )
 
     # HF HUB arguments:
