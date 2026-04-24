@@ -111,7 +111,7 @@ class ModelArguments(BaseConfig):
 
     def get_model_load_kwargs(self):
         """Returns a dictionary that is ready to be passed to AutoModelForCausalLM.from_pretrained as **kwargs"""
-        return self.model_dump(exclude_unset=True)
+        return self.model_dump(exclude_unset=True, exclude_none=True)
 
 
 class RunConfig(BaseConfig):
