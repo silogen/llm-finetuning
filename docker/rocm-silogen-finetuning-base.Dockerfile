@@ -16,6 +16,7 @@ RUN groupadd -g ${GROUP_ID} ${GROUP_NAME} && \
 # Install minio
 RUN curl https://dl.min.io/client/mc/release/linux-amd64/mc \
     --create-dirs \
+    --location \
     -o /minio-binaries/mc && \
     chown -hR ${USER_NAME} /minio-binaries/ && \
     chmod +x /minio-binaries/mc
