@@ -7,6 +7,7 @@ set -eu
 DEFAULT_REGISTRY=ghcr.io/silogen
 REGISTRY=${REGISTRY:-$DEFAULT_REGISTRY}
 SKIP_PUSH=${SKIP_PUSH:-"false"}
+CLEAN_CHECKOUT=${CLEAN_CHECKOUT:-"true"}
 BUILD_TARGET=${BUILD_TARGET:-linux/amd64}
 
 if [ "$#" -ne 2 ]; then
@@ -24,8 +25,21 @@ fi
 platform="$1"
 tag="$2"
 
-tmp_worker_dockerfile=$(mktemp docker/tmp.$platform-silogen-finetuning-worker.Dockerfile.XXXXXXXXXX)
-trap 'rm -f "$tmp_worker_dockerfile"' EXIT
+if [ "$CLEAN_CHECKOUT" == "true" ]; then
+  if ! (git diff --exit-code --quiet && git diff --cached --exit-code --quiet); then
+    echo "Working directory has changes, bailing!"
+    exit 1
+  fi
+  clean_tmp=$(mktemp -d)
+  git clone . "$clean_tmp"
+  cd "$clean_tmp"
+  tmp_worker_dockerfile=$(mktemp docker/tmp.$platform-silogen-finetuning-worker.Dockerfile.XXXXXXXXXX)
+  trap 'rm -rf "$clean_tmp"' EXIT
+else
+  tmp_worker_dockerfile=$(mktemp docker/tmp.$platform-silogen-finetuning-worker.Dockerfile.XXXXXXXXXX)
+  trap 'rm -f "$tmp_worker_dockerfile"' EXIT
+fi
+
 sed "s,FROM $DEFAULT_REGISTRY/$platform-silogen-finetuning-base:main,FROM $REGISTRY/$platform-silogen-finetuning-base:$tag,g" \
   docker/$platform-silogen-finetuning-worker.Dockerfile > $tmp_worker_dockerfile
 docker build --platform $BUILD_TARGET -f docker/$platform-silogen-finetuning-base.Dockerfile -t "$REGISTRY/$platform-silogen-finetuning-base:$tag" .
